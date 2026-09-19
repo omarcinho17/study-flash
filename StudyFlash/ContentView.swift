@@ -12,6 +12,8 @@ struct ContentView: View {
     @State private var tarjetas: [Flashcard] = []
     @State private var cargando = false
     @State private var error: String?
+    @State private var indiceAcutual = 0
+    @State private var estudiando = false
 
     var body: some View {
         NavigationStack {
@@ -35,14 +37,20 @@ struct ContentView: View {
                         Text(error).foregroundStyle(.red)
                     }
 
-                    ForEach(tarjetas.indices, id: \.self) { i in
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text(tarjetas[i].pregunta).font(.headline)
-                            Text(tarjetas[i].respuesta).foregroundStyle(.secondary)
+                    if !tarjetas.isEmpty{
+                        Text("Tarjeta \(indiceAcutual + 1) de \(tarjetas.count)")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        TarjetaView(tarjeta: tarjetas[indiceAcutual])
+                            .id(indiceAcutual)
+                        
+                        Button("Siguiente"){
+                            if indiceAcutual < tarjetas.count - 1{
+                                indiceAcutual += 1
+                            }
                         }
-                        .padding()
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(.blue.opacity(0.1), in: .rect(cornerRadius: 12))
+                        .buttonStyle(.bordered)
+                        .disabled(indiceAcutual >= tarjetas.count - 1)
                     }
                 }
                 .padding()
@@ -54,6 +62,7 @@ struct ContentView: View {
     func crear() async {
         cargando = true
         error = nil
+        indiceAcutual = 0
         do {
             tarjetas = try await generarTarjetas(de: apuntes)
         } catch {
