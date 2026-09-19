@@ -6,56 +6,63 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @State private var apuntes = ""
+    @State private var tarjetas: [Flashcard] = []
+    @State private var cargando = false
+    @State private var error: String?
 
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    TextEditor(text: $apuntes)
+                        .frame(height: 160)
+                        .padding(8)
+                        .background(.gray.opacity(0.15), in: .rect(cornerRadius: 12))
+
+                    Button {
+                        Task { await crear() }
                     } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+                        Text(cargando ? "Generando..." : "Crear flashcards")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(apuntes.isEmpty || cargando)
+
+                    if let error {
+                        Text(error).foregroundStyle(.red)
+                    }
+
+                    ForEach(tarjetas.indices, id: \.self) { i in
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(tarjetas[i].pregunta).font(.headline)
+                            Text(tarjetas[i].respuesta).foregroundStyle(.secondary)
+                        }
+                        .padding()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(.blue.opacity(0.1), in: .rect(cornerRadius: 12))
                     }
                 }
-                .onDelete(perform: deleteItems)
+                .padding()
             }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
-            }
-        } detail: {
-            Text("Select an item")
+            .navigationTitle("StudyFlash")
         }
     }
 
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
+    func crear() async {
+        cargando = true
+        error = nil
+        do {
+            tarjetas = try await generarTarjetas(de: apuntes)
+        } catch {
+            self.error = "No se pudo generar: \(error.localizedDescription)"
         }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
-            }
-        }
+        cargando = false
     }
 }
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
 }
