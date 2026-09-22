@@ -12,10 +12,12 @@ struct ContentView: View {
     @State private var tarjetas: [Flashcard] = []
     @State private var cargando = false
     @State private var error: String?
-    @State private var indiceAcutual = 0
+    @State private var indiceActual = 0
     @State private var estudiando = false
-    @State private var acertadas = 0
-    @State private var noAcertadas = 0
+    @State private var cantidad = 5
+    @State private var enExamen = false
+    @State private var examen: [PreguntaExamen] = []
+    @State private var preparandoExamen = false
 
     var body: some View {
         NavigationStack {
@@ -25,6 +27,7 @@ struct ContentView: View {
                         .frame(height: 160)
                         .padding(8)
                         .background(.gray.opacity(0.15), in: .rect(cornerRadius: 12))
+                    Stepper("Cantidad: \(cantidad)", value: $cantidad, in: 3...10)
 
                     Button {
                         Task { await crear() }
@@ -40,54 +43,66 @@ struct ContentView: View {
                     }
 
                     if !tarjetas.isEmpty{
-                        Text("Tarjeta \(indiceAcutual + 1) de \(tarjetas.count)")
+                        Text("Tarjeta \(indiceActual + 1) de \(tarjetas.count)")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
-                        TarjetaView(tarjeta: tarjetas[indiceAcutual])
-                            .id(indiceAcutual)
-                        
-                        HStack(spacing: 12){
-                            Button("No acerte"){
-                                noAcertadas += 1
-                                if indiceAcutual < tarjetas.count - 1{
-                                    indiceAcutual += 1
-                                }
-                            }
-                            .buttonStyle(.bordered)
-                            .tint(.red)
-                            
-                            Button("Acerte"){
-                                acertadas += 1
-                                if indiceAcutual < tarjetas.count - 1{
-                                    indiceAcutual += 1
-                                }
-                            }
-                            .buttonStyle(.bordered)
-                            .tint(.green)
-                        }
-                        
-                        Text("😎 \(acertadas)    😑 \(noAcertadas)")
-                            .font(.headline)
+                        TarjetaView(tarjeta: tarjetas[indiceActual])
+                            .id(indiceActual)
                     }
+                    
+                    HStack(spacing: 12) {
+                        Button("Anterior") {
+                            indiceActual -= 1
+                        }
+                        .buttonStyle(.bordered)
+                        .disabled(indiceActual == 0)
+
+                        if indiceActual < tarjetas.count - 1 {
+                            Button("Siguiente") {
+                                indiceActual += 1
+                            }
+                            .buttonStyle(.borderedProminent)
+                        } else {
+                            Button(preparandoExamen ? "Preparando..." : "Ir al examen") {
+                                Task { await prepararExamen() }
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(.green)
+                            .disabled(preparandoExamen)
+                        }
+                    }
+                    
                 }
                 .padding()
             }
             .navigationTitle("StudyFlash")
+            .fullScreenCover(isPresented: $enExamen){
+                ExamenView(preguntas: examen)
+            }
         }
     }
 
     func crear() async {
         cargando = true
         error = nil
-        indiceAcutual = 0
-        acertadas = 0
-        noAcertadas = 0
+        indiceActual = 0
         do {
-            tarjetas = try await generarTarjetas(de: apuntes)
+            tarjetas = try await generarTarjetas(de: apuntes, cantidad: cantidad)
         } catch {
             self.error = "No se pudo generar: \(error.localizedDescription)"
         }
         cargando = false
+    }
+    
+    func prepararExamen() async {
+        preparandoExamen = true
+        do {
+            examen = try await generarExamen(de: tarjetas)
+            enExamen = true
+        } catch {
+            self.error = "No se pudo preparar el examen: \(error.localizedDescription)"
+        }
+        preparandoExamen = false
     }
 }
 

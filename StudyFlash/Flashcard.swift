@@ -18,7 +18,13 @@ struct Flashcard{
 }
 
 @Generable
+struct OpcionesIncorrectas {
+    @Guide(description: "Tres respuestas incorrectas pero creíbles, de longitud parecida a la respuesta correcta", .count(3))
+    var incorrectas: [String]
+}
+
+@Generable
 struct FlashcardSet{
-    @Guide(description: "Lista de flashcards para estudiar", .count(5))
+    @Guide(description: "Lista de flashcards para estudiar")
     var tarjetas: [Flashcard]
 }
