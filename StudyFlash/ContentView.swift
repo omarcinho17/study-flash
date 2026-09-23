@@ -28,7 +28,7 @@ struct ContentView: View {
                     TextEditor(text: $apuntes)
                         .frame(height: 160)
                         .padding(8)
-                        .background(.gray.opacity(0.15), in: .rect(cornerRadius: 12))
+                        .background(.gray.opacity(0.20), in: .rect(cornerRadius: 12))
                     Stepper("Cantidad: \(cantidad)", value: $cantidad, in: 3...10)
 
                     Button {
@@ -65,7 +65,7 @@ struct ContentView: View {
                             }
                             .buttonStyle(.borderedProminent)
                         } else {
-                            Button(preparandoExamen ? "Preparando..." : "Ir al examen") {
+                            Button(preparandoExamen ? "Preparando..." : "Hacer Evaluacion") {
                                 Task { await prepararExamen() }
                             }
                             .buttonStyle(.borderedProminent)

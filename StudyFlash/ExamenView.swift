@@ -10,6 +10,10 @@ import SwiftUI
 struct ExamenView: View {
     let preguntasIniciales: [PreguntaExamen]
     @State private var preguntas: [PreguntaExamen] = []
+    init(preguntasIniciales: [PreguntaExamen]) {
+        self.preguntasIniciales = preguntasIniciales
+        _preguntas = State(initialValue: preguntasIniciales)
+    }
     @Environment(\.dismiss) private var dismiss
 
     @State private var indice = 0
@@ -57,11 +61,6 @@ struct ExamenView: View {
             Spacer()
         }
         .padding()
-        .onAppear {
-            if preguntas.isEmpty {
-                preguntas = preguntasIniciales
-            }
-        }
     }
 
     func color(para opcion: String) -> Color {
