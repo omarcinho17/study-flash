@@ -28,7 +28,7 @@ struct ContentView: View {
                     TextEditor(text: $apuntes)
                         .frame(height: 160)
                         .padding(8)
-                        .background(.gray.opacity(0.20), in: .rect(cornerRadius: 12))
+                        .background(.gray.opacity(0.20), in: .rect(cornerRadius: 20))
                     Stepper("Cantidad: \(cantidad)", value: $cantidad, in: 3...10)
 
                     Button {
@@ -80,6 +80,13 @@ struct ContentView: View {
             .navigationTitle("StudyFlash")
             .fullScreenCover(isPresented: $enExamen){
                 ExamenView(preguntasIniciales: examen)
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink("Mis sets") {
+                        ListaSetsView()
+                    }
+                }
             }
         }
     }
