@@ -8,13 +8,15 @@
 import SwiftUI
 
 struct ExamenView: View {
-    let preguntas: [PreguntaExamen]
+    let preguntasIniciales: [PreguntaExamen]
+    @State private var preguntas: [PreguntaExamen] = []
     @Environment(\.dismiss) private var dismiss
 
     @State private var indice = 0
     @State private var mostrarOpciones = false
     @State private var seleccionada: String?
     @State private var aciertos = 0
+    @State private var falladas: [PreguntaExamen] = []
     @State private var terminado = false
 
     var preguntaActual: PreguntaExamen { preguntas[indice] }
@@ -55,6 +57,11 @@ struct ExamenView: View {
             Spacer()
         }
         .padding()
+        .onAppear {
+            if preguntas.isEmpty {
+                preguntas = preguntasIniciales
+            }
+        }
     }
 
     func color(para opcion: String) -> Color {
@@ -67,7 +74,11 @@ struct ExamenView: View {
     func elegir(_ opcion: String) {
         guard seleccionada == nil else { return }
         seleccionada = opcion
-        if opcion == preguntaActual.correcta { aciertos += 1 }
+        if opcion == preguntaActual.correcta{
+            aciertos += 1
+        } else{
+            falladas.append(preguntaActual)
+        }
         Task {
             try? await Task.sleep(for: .seconds(2))
             avanzar()
@@ -83,20 +94,39 @@ struct ExamenView: View {
             terminado = true
         }
     }
+    
+    func reiniciar(con nuevas: [PreguntaExamen]) {
+        preguntas = nuevas
+        indice = 0
+        seleccionada = nil
+        mostrarOpciones = false
+        aciertos = 0
+        falladas = []
+        terminado = false
+    }
 
     var resultados: some View {
         VStack(spacing: 16) {
             Text("Acertaste \(aciertos) de \(preguntas.count)")
                 .font(.largeTitle.bold())
-            Button("Cerrar") { dismiss() }
+
+            if !falladas.isEmpty {
+                Button("Repasar las que fallé") {
+                    reiniciar(con: falladas)
+                }
                 .buttonStyle(.borderedProminent)
+                .tint(.orange)
+            }
+
+            Button("Cerrar") { dismiss() }
+                .buttonStyle(.bordered)
         }
         .padding(.top, 80)
     }
 }
 
 #Preview {
-    ExamenView(preguntas: [
+    ExamenView(preguntasIniciales:[
         PreguntaExamen(
             pregunta: "¿Qué es una API?",
             correcta: "Permite comunicación entre programas",

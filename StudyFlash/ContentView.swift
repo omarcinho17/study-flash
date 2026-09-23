@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ContentView: View {
     @State private var apuntes = ""
@@ -18,6 +19,7 @@ struct ContentView: View {
     @State private var enExamen = false
     @State private var examen: [PreguntaExamen] = []
     @State private var preparandoExamen = false
+    @Environment(\.modelContext) private var contexto
 
     var body: some View {
         NavigationStack {
@@ -77,7 +79,7 @@ struct ContentView: View {
             }
             .navigationTitle("StudyFlash")
             .fullScreenCover(isPresented: $enExamen){
-                ExamenView(preguntas: examen)
+                ExamenView(preguntasIniciales: examen)
             }
         }
     }
@@ -88,6 +90,7 @@ struct ContentView: View {
         indiceActual = 0
         do {
             tarjetas = try await generarTarjetas(de: apuntes, cantidad: cantidad)
+            guardarSet()
         } catch {
             self.error = "No se pudo generar: \(error.localizedDescription)"
         }
@@ -103,6 +106,13 @@ struct ContentView: View {
             self.error = "No se pudo preparar el examen: \(error.localizedDescription)"
         }
         preparandoExamen = false
+    }
+    
+    func guardarSet() {
+        let guardadas = tarjetas.map { TarjetaGuardada(pregunta: $0.pregunta, respuesta: $0.respuesta) }
+        let titulo = String(apuntes.prefix(30))
+        let nuevoSet = SetDeEstudio(titulo: titulo, tarjetas: guardadas)
+        contexto.insert(nuevoSet)
     }
 }
 

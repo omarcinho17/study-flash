@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct StudyFlashApp: App {
@@ -13,5 +14,6 @@ struct StudyFlashApp: App {
         WindowGroup {
             ContentView()
         }
+        .modelContainer(for: SetDeEstudio.self)
     }
 }
