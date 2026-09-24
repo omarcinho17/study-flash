@@ -15,12 +15,16 @@ struct ListaSetsView: View {
     var body: some View {
         List {
             ForEach(sets) { set in
-                VStack(alignment: .leading) {
-                    Text(set.titulo)
-                        .font(.headline)
-                    Text(set.fecha.formatted(date: .abbreviated, time: .shortened))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                NavigationLink{
+                    ContentView(setInicial: set)
+                } label: {
+                    VStack(alignment: .leading){
+                        Text(set.titulo)
+                            .font(.headline)
+                        Text(set.fecha.formatted(date: .abbreviated, time: .shortened))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
             .onDelete(perform: borrar)

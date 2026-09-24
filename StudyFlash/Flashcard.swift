@@ -28,3 +28,9 @@ struct FlashcardSet{
     @Guide(description: "Lista de flashcards para estudiar")
     var tarjetas: [Flashcard]
 }
+
+extension TarjetaGuardada{
+    func aFlashcard() -> Flashcard{
+        Flashcard(pregunta: pregunta, respuesta: respuesta)
+    }
+}

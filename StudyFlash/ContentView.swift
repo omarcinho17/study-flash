@@ -20,6 +20,12 @@ struct ContentView: View {
     @State private var examen: [PreguntaExamen] = []
     @State private var preparandoExamen = false
     @Environment(\.modelContext) private var contexto
+    init(setInicial: SetDeEstudio? = nil){
+        if let setInicial{
+            _tarjetas = State(initialValue: setInicial.tarjetas.map{ $0.aFlashcard()})
+            _apuntes = State(initialValue: setInicial.titulo)
+        }
+    }
 
     var body: some View {
         NavigationStack {
