@@ -19,6 +19,7 @@ struct ContentView: View {
     @State private var enExamen = false
     @State private var examen: [PreguntaExamen] = []
     @State private var preparandoExamen = false
+    @State private var mostrandoEscaner = false
     @Environment(\.modelContext) private var contexto
     init(setInicial: SetDeEstudio? = nil){
         if let setInicial{
@@ -31,6 +32,12 @@ struct ContentView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
+                    Button{
+                        mostrandoEscaner = true
+                    } label: {
+                        Label("Escanear documento", systemImage: "doc.viewfinder")
+                    }
+                    .buttonStyle(.bordered)
                     TextEditor(text: $apuntes)
                         .frame(height: 160)
                         .padding(8)
@@ -82,6 +89,11 @@ struct ContentView: View {
                     
                 }
                 .padding()
+            }
+            .sheet(isPresented: $mostrandoEscaner){
+                EscanerDocumentos{textoEscaneado in
+                    apuntes = textoEscaneado
+                }
             }
             .navigationTitle("StudyFlash")
             .fullScreenCover(isPresented: $enExamen){
