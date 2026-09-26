@@ -134,7 +134,7 @@ struct ContentView: View {
     }
     
     func guardarSet() {
-        let guardadas = tarjetas.map { TarjetaGuardada(pregunta: $0.pregunta, respuesta: $0.respuesta) }
+        let guardadas = tarjetas.map { TarjetaGuardada(pregunta: $0.pregunta, respuesta: $0.respuesta, expliacion: $0.expliacion) }
         let titulo = String(apuntes.prefix(30))
         let nuevoSet = SetDeEstudio(titulo: titulo, tarjetas: guardadas)
         contexto.insert(nuevoSet)

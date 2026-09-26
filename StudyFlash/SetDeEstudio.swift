@@ -24,5 +24,6 @@ class SetDeEstudio{
     struct TarjetaGuardada: Codable {
         var pregunta: String
         var respuesta: String
+        var expliacion: String
     }
 

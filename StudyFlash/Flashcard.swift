@@ -12,9 +12,11 @@ struct Flashcard{
     @Guide(description: "Una pregunta clara y corta sobre un concepto importante del texto")
     var pregunta: String
     
-    @Guide(description: "La respuesta breve y correcta de la pregunta")
+    @Guide(description: "La respuesta correcta, completa en 1 o 2 oraciones, no solo una palabra o frase muy corta")
     var respuesta: String
     
+    @Guide(description: "Una explicacion de 2 a 4 oraciones, en lenguaje sencillo, que profundice el porque de la respuesta, agregue contexto y de un ejemplo de la vida diaria")
+    var expliacion: String
 }
 
 @Generable
@@ -31,6 +33,6 @@ struct FlashcardSet{
 
 extension TarjetaGuardada{
     func aFlashcard() -> Flashcard{
-        Flashcard(pregunta: pregunta, respuesta: respuesta)
+        Flashcard(pregunta: pregunta, respuesta: respuesta, expliacion: expliacion)
     }
 }

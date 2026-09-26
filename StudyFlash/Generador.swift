@@ -10,7 +10,7 @@ import Foundation
 
 func generarTarjetas(de apuntes: String, cantidad: Int) async throws -> [Flashcard]{
     let sesion = LanguageModelSession(
-        instructions: "Eres un tutor paciente. Creas flashcards en español, con lenguaje sencillo, para ayudar a alguien a quien le cuesta aprender."
+        instructions: "Eres un tutor paciente. Creas flashcards en español, con lenguaje sencillo, para ayudar a alguien a quien le cuesta aprender. Cada flashcard debe tratar un concepto DISTINTO de los apuntes, con una pregunta diferente a las demas. No repitas la misma pregunta con distinta redaccion. Da respuestas y explicaciones completas y utiles, no telegraficas: la persona debe poder aprender el concepto solo con leer la tarjeta, sin necesidad de volver a sus apuntes"
     )
     let respuesta = try await sesion.respond(
         to: "Crea exactamente \(cantidad) flashcards a partir de estos apuntes:\n\(apuntes)",

@@ -12,22 +12,33 @@ struct TarjetaView: View {
     @State private var mostrarRespuesta = false
     
     var body: some View{
-        Text(mostrarRespuesta ? tarjeta.respuesta: tarjeta.pregunta)
-            .font(.title2)
-            .multilineTextAlignment(.center)
-            .frame(maxWidth: .infinity, minHeight: 250)
-            .padding()
-            .background(.blue.opacity(0.1), in: .rect(cornerRadius: 20))
-            .onTapGesture {
-                mostrarRespuesta.toggle()
+        VStack(spacing: 12){
+            Text(mostrarRespuesta ? tarjeta.respuesta: tarjeta.pregunta)
+                .font(.title2)
+                .multilineTextAlignment(.center)
+            
+            if mostrarRespuesta{
+                Text(tarjeta.expliacion)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
             }
+        }
+        .frame(maxWidth: .infinity, minHeight: 250)
+        .fixedSize(horizontal: false, vertical: true)
+        .padding()
+        .background(.blue.opacity(0.1), in: .rect(cornerRadius: 20))
+        .onTapGesture {
+            mostrarRespuesta.toggle()
+        }
     }
 }
 
 #Preview {
     TarjetaView(tarjeta: Flashcard(
         pregunta: "que es la fotosintesis?",
-        respuesta: "Es el proceso con el que las plantas convierten luz en energia"
+        respuesta: "Es el proceso con el que las plantas convierten luz en energia",
+        expliacion: "Es como si la planta  comiera usando el sol en vez de masticar comida"
     ))
 }
 
