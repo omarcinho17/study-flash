@@ -24,10 +24,12 @@ struct TarjetaView: View {
                     .multilineTextAlignment(.center)
             }
         }
-        .frame(maxWidth: .infinity, minHeight: 250)
-        .fixedSize(horizontal: false, vertical: true)
-        .padding()
-        .background(.blue.opacity(0.1), in: .rect(cornerRadius: 20))
+        .background(Color.menta.opacity(0.15), in: .rect(cornerRadius: 20))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(Color.menta.opacity(0.4), lineWidth: 1)
+        )
+        .shadow(color: Color.menta.opacity(0.2), radius: 8, y: 4)
         .onTapGesture {
             mostrarRespuesta.toggle()
         }

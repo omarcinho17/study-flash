@@ -13,7 +13,10 @@ struct StudyFlashApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .tint(.menta)
         }
         .modelContainer(for: SetDeEstudio.self)
     }
 }
+
+

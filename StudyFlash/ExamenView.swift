@@ -50,6 +50,8 @@ struct ExamenView: View {
                         }
                         .buttonStyle(.plain)
                         .background(color(para: opcion), in: .rect(cornerRadius: 12))
+                        .scaleEffect(seleccionada == opcion ? 1.06 : 1.0)
+                        .animation(.spring(response: 0.3, dampingFraction: 0.4), value: seleccionada)
                     }
                 } else {
                     Button("Siguiente") {
@@ -62,14 +64,14 @@ struct ExamenView: View {
         }
         .padding()
     }
-
+    
     func color(para opcion: String) -> Color {
-        guard let seleccionada else { return .gray.opacity(0.15) }
-        if opcion == preguntaActual.correcta { return .green.opacity(0.6) }
-        if opcion == seleccionada { return .red.opacity(0.6) }
-        return .gray.opacity(0.15)
+        guard let seleccionada else { return .gray.opacity(0.12) }
+        if opcion == preguntaActual.correcta { return .correcto.opacity(0.7) }
+        if opcion == seleccionada { return .coral.opacity(0.7) }
+        return .gray.opacity(0.12)
     }
-
+    
     func elegir(_ opcion: String) {
         guard seleccionada == nil else { return }
         seleccionada = opcion
@@ -114,7 +116,7 @@ struct ExamenView: View {
                     reiniciar(con: falladas)
                 }
                 .buttonStyle(.borderedProminent)
-                .tint(.orange)
+                .tint(.coral)
             }
 
             Button("Cerrar") { dismiss() }

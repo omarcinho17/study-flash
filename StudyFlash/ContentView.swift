@@ -112,6 +112,7 @@ struct ContentView: View {
                     NavigationLink("Mis sets") {
                         ListaSetsView()
                     }
+                    .tint(.coral)
                 }
             }
         }
