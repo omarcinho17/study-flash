@@ -45,6 +45,7 @@ struct ChatView: View {
         }
         .navigationTitle("Pregúntale a tus apuntes")
         .navigationBarTitleDisplayMode(.inline)
+        .background(Color(red: 0.94, green: 0.98, blue: 0.96))
     }
 
     func iniciarSesion() {

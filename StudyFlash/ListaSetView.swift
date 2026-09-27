@@ -37,6 +37,7 @@ struct ListaSetsView: View {
             contexto.delete(sets[indice])
         }
     }
+    
 }
 
 #Preview {

@@ -21,9 +21,10 @@ struct ContentView: View {
     @State private var preparandoExamen = false
     @State private var mostrandoEscaner = false
     @Environment(\.modelContext) private var contexto
-    init(setInicial: SetDeEstudio? = nil){
-        if let setInicial{
-            _tarjetas = State(initialValue: setInicial.tarjetas.map{ $0.aFlashcard()})
+
+    init(setInicial: SetDeEstudio? = nil) {
+        if let setInicial {
+            _tarjetas = State(initialValue: setInicial.tarjetas.map { $0.aFlashcard() })
             _apuntes = State(initialValue: setInicial.titulo)
         }
     }
@@ -31,66 +32,109 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    TextEditor(text: $apuntes)
-                        .frame(height: 160)
-                        .padding(8)
-                        .background(.gray.opacity(0.20), in: .rect(cornerRadius: 20))
-                    Stepper("Cantidad: \(cantidad)", value: $cantidad, in: 3...10)
+                VStack(spacing: 20) {
 
-                    Button {
-                        Task { await crear() }
-                    } label: {
-                        Text(cargando ? "Generando..." : "Crear flashcards")
-                            .frame(maxWidth: .infinity)
+                    // Sección: apuntes
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Tus apuntes")
+                            .font(.caption.bold())
+                            .foregroundStyle(.secondary)
+
+                        TextEditor(text: $apuntes)
+                            .frame(height: 100)
+                            .padding(8)
+                            .background(.white.opacity(0.6), in: .rect(cornerRadius: 14))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 14)
+                                    .stroke(.gray.opacity(0.2), lineWidth: 1)
+                            )
                     }
-                    .buttonStyle(.borderedProminent)
-                    .disabled(apuntes.isEmpty || cargando)
+
+                    // Sección: controles, en una sola línea compacta
+                    HStack(spacing: 12) {
+                        Stepper(value: $cantidad, in: 3...10) {
+                            Text("\(cantidad) tarjetas")
+                                .font(.subheadline)
+                        }
+
+                        Button {
+                            Task { await crear() }
+                        } label: {
+                            Text(cargando ? "Generando..." : "Generar")
+                                .font(.subheadline.bold())
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 8)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .clipShape(.capsule)
+                        .disabled(apuntes.isEmpty || cargando)
+                    }
 
                     if let error {
-                        Text(error).foregroundStyle(.red)
+                        Text(error)
+                            .font(.caption)
+                            .foregroundStyle(.red)
                     }
 
-                    if !tarjetas.isEmpty{
-                        Text("Tarjeta \(indiceActual + 1) de \(tarjetas.count)")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                        TarjetaView(tarjeta: tarjetas[indiceActual])
-                            .id(indiceActual)
-                    }
-                    
-                    HStack(spacing: 12) {
-                        Button("Anterior") {
-                            indiceActual -= 1
-                        }
-                        .buttonStyle(.bordered)
-                        .disabled(indiceActual == 0)
+                    Divider()
+                        .padding(.vertical, 4)
 
-                        if indiceActual < tarjetas.count - 1 {
-                            Button("Siguiente") {
-                                indiceActual += 1
+                    // Sección: la tarjeta, protagonista
+                    if !tarjetas.isEmpty {
+                        VStack(spacing: 16) {
+                            Text("Tarjeta \(indiceActual + 1) de \(tarjetas.count)")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+
+                            TarjetaView(tarjeta: tarjetas[indiceActual])
+                                .id(indiceActual)
+                                .transition(.asymmetric(
+                                    insertion: .move(edge: .trailing).combined(with: .opacity),
+                                    removal: .move(edge: .leading).combined(with: .opacity)
+                                ))
+
+                            HStack(spacing: 12) {
+                                Button {
+                                    withAnimation(.easeInOut(duration: 0.3)) { indiceActual -= 1 }
+                                } label: {
+                                    Image(systemName: "chevron.left")
+                                        .frame(width: 44, height: 44)
+                                }
+                                .buttonStyle(.bordered)
+                                .clipShape(.circle)
+                                .disabled(indiceActual == 0)
+
+                                if indiceActual < tarjetas.count - 1 {
+                                    Button {
+                                        withAnimation(.easeInOut(duration: 0.3)) { indiceActual += 1 }
+                                    } label: {
+                                        Image(systemName: "chevron.right")
+                                            .frame(width: 44, height: 44)
+                                    }
+                                    .buttonStyle(.bordered)
+                                    .clipShape(.circle)
+                                } else {
+                                    Button(preparandoExamen ? "Preparando..." : "Hacer examen") {
+                                        Task { await prepararExamen() }
+                                    }
+                                    .buttonStyle(.borderedProminent)
+                                    .clipShape(.capsule)
+                                    .tint(.green)
+                                    .disabled(preparandoExamen)
+                                }
                             }
-                            .buttonStyle(.borderedProminent)
-                        } else {
-                            Button(preparandoExamen ? "Preparando..." : "Hacer Evaluacion") {
-                                Task { await prepararExamen() }
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .tint(.green)
-                            .disabled(preparandoExamen)
                         }
                     }
-                    
                 }
                 .padding()
             }
-            .sheet(isPresented: $mostrandoEscaner){
-                EscanerDocumentos{textoEscaneado in
+            .sheet(isPresented: $mostrandoEscaner) {
+                EscanerDocumentos { textoEscaneado in
                     apuntes = textoEscaneado
                 }
             }
             .navigationTitle("StudyFlash")
-            .fullScreenCover(isPresented: $enExamen){
+            .fullScreenCover(isPresented: $enExamen) {
                 ExamenView(preguntasIniciales: examen)
             }
             .toolbar {
@@ -119,6 +163,7 @@ struct ContentView: View {
                     .tint(.lila)
                 }
             }
+            .background(Color(red: 0.94, green: 0.98, blue: 0.96))
         }
     }
 
@@ -134,7 +179,7 @@ struct ContentView: View {
         }
         cargando = false
     }
-    
+
     func prepararExamen() async {
         preparandoExamen = true
         do {
@@ -145,7 +190,7 @@ struct ContentView: View {
         }
         preparandoExamen = false
     }
-    
+
     func guardarSet() {
         let guardadas = tarjetas.map { TarjetaGuardada(pregunta: $0.pregunta, respuesta: $0.respuesta, expliacion: $0.expliacion) }
         let titulo = String(apuntes.prefix(30))

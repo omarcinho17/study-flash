@@ -30,15 +30,27 @@ struct ExamenView: View {
             if terminado {
                 resultados
             } else {
-                Text("Pregunta \(indice + 1) de \(preguntas.count)  ·  ✅ \(aciertos)")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-
+                HStack{
+                    ProgressView(value: Double(indice), total: Double(preguntas.count))
+                        .tint(.menta)
+                    Label("\(indice + 1) de \(preguntas.count)", systemImage: "doc.text")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Label("\(aciertos)", systemImage: "checkmark.circle.fill")
+                        .font(.subheadline.bold())
+                        .foregroundStyle(Color.correcto)
+                }
+                
                 Text(preguntaActual.pregunta)
                     .font(.title2.bold())
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: .infinity, minHeight: 120)
-
+                    .id(indice)
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .trailing).combined(with: .opacity),
+                        removal: .move(edge: .leading).combined(with: .opacity)
+                    ))
                 if mostrarOpciones {
                     ForEach(preguntaActual.opciones, id: \.self) { opcion in
                         Button {
@@ -63,6 +75,7 @@ struct ExamenView: View {
             Spacer()
         }
         .padding()
+        .background(Color(red: 0.94, green: 0.98, blue: 0.96))
     }
     
     func color(para opcion: String) -> Color {
@@ -87,15 +100,16 @@ struct ExamenView: View {
     }
 
     func avanzar() {
-        if indice < preguntas.count - 1 {
-            indice += 1
-            seleccionada = nil
-            mostrarOpciones = false
-        } else {
-            terminado = true
+        withAnimation(.easeInOut(duration: 0.3)){
+            if indice < preguntas.count - 1 {
+                indice += 1
+                seleccionada = nil
+                mostrarOpciones = false
+            } else {
+                terminado = true
+            }
         }
     }
-    
     func reiniciar(con nuevas: [PreguntaExamen]) {
         preguntas = nuevas
         indice = 0
@@ -107,23 +121,35 @@ struct ExamenView: View {
     }
 
     var resultados: some View {
-        VStack(spacing: 16) {
-            Text("Acertaste \(aciertos) de \(preguntas.count)")
-                .font(.largeTitle.bold())
-
-            if !falladas.isEmpty {
-                Button("Repasar las que fallé") {
-                    reiniciar(con: falladas)
+        ZStack{
+            Color(red: 0.94, green: 0.98, blue: 0.96)
+                    .ignoresSafeArea()
+            VStack(spacing: 20) {
+                Image(systemName: aciertos == preguntas.count ? "star.fill" : "checkmark.circle.fill")
+                    .font(.system(size: 50))
+                    .foregroundStyle(Color.correcto)
+                
+                Text("Acertaste \(aciertos) de \(preguntas.count)")
+                    .font(.largeTitle.bold())
+                
+                if !falladas.isEmpty {
+                    Button("Repasar las que fallé") {
+                        reiniciar(con: falladas)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.coral)
+                    .clipShape(.capsule)
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(.coral)
+                
+                Button("Cerrar") { dismiss() }
+                    .buttonStyle(.bordered)
+                    .tint(.menta)
+                    .clipShape(.capsule)
             }
-
-            Button("Cerrar") { dismiss() }
-                .buttonStyle(.bordered)
+            .padding(.top, 80)
         }
-        .padding(.top, 80)
     }
+    
 }
 
 #Preview {
