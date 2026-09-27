@@ -15,17 +15,26 @@ struct ListaSetsView: View {
     var body: some View {
         List {
             ForEach(sets) { set in
-                NavigationLink{
+                NavigationLink {
                     ContentView(setInicial: set)
                 } label: {
-                    VStack(alignment: .leading){
-                        Text(set.titulo)
-                            .font(.headline)
-                        Text(set.fecha.formatted(date: .abbreviated, time: .shortened))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                    HStack(spacing: 14) {
+                        Image(systemName: "rectangle.stack.fill")
+                            .font(.title2)
+                            .foregroundStyle(Color.menta)
+                            .frame(width: 40)
+
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(set.titulo)
+                                .font(.headline)
+                            Text(set.fecha.formatted(date: .abbreviated, time: .shortened))
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
                     }
+                    .padding(.vertical, 6)
                 }
+                .listRowBackground(Color.white.opacity(0.6))
             }
             .onDelete(perform: borrar)
         }

@@ -52,18 +52,31 @@ struct ExamenView: View {
                         removal: .move(edge: .leading).combined(with: .opacity)
                     ))
                 if mostrarOpciones {
-                    ForEach(preguntaActual.opciones, id: \.self) { opcion in
-                        Button {
-                            elegir(opcion)
-                        } label: {
-                            Text(opcion)
-                                .frame(maxWidth: .infinity, alignment: .leading)
+                    VStack(spacing: 10) {
+                        ForEach(preguntaActual.opciones, id: \.self) { opcion in
+                            Button {
+                                elegir(opcion)
+                            } label: {
+                                HStack {
+                                    Text(opcion)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    if seleccionada != nil {
+                                        if opcion == preguntaActual.correcta {
+                                            Image(systemName: "checkmark.circle.fill")
+                                                .foregroundStyle(.white)
+                                        } else if opcion == seleccionada {
+                                            Image(systemName: "xmark.circle.fill")
+                                                .foregroundStyle(.white)
+                                        }
+                                    }
+                                }
                                 .padding()
+                            }
+                            .buttonStyle(.plain)
+                            .background(color(para: opcion), in: .rect(cornerRadius: 12))
+                            .scaleEffect(seleccionada == opcion ? 1.06 : 1.0)
+                            .animation(.spring(response: 0.3, dampingFraction: 0.4), value: seleccionada)
                         }
-                        .buttonStyle(.plain)
-                        .background(color(para: opcion), in: .rect(cornerRadius: 12))
-                        .scaleEffect(seleccionada == opcion ? 1.06 : 1.0)
-                        .animation(.spring(response: 0.3, dampingFraction: 0.4), value: seleccionada)
                     }
                 } else {
                     Button("Siguiente") {
@@ -147,6 +160,7 @@ struct ExamenView: View {
                     .clipShape(.capsule)
             }
             .padding(.top, 80)
+            
         }
     }
     

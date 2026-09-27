@@ -10,8 +10,8 @@ import FoundationModels
 
 struct ChatView: View {
     let apuntes: String
+    @Binding var mensajes: [MensajeChat]
 
-    @State private var mensajes: [MensajeChat] = []
     @State private var preguntaActual = ""
     @State private var cargando = false
     @State private var sesion: LanguageModelSession?
@@ -45,7 +45,9 @@ struct ChatView: View {
         }
         .navigationTitle("Pregúntale a tus apuntes")
         .navigationBarTitleDisplayMode(.inline)
-        .background(Color(red: 0.94, green: 0.98, blue: 0.96))
+        .onAppear {
+            if sesion == nil { iniciarSesion() }
+        }
     }
 
     func iniciarSesion() {
@@ -74,6 +76,6 @@ struct ChatView: View {
 
 #Preview {
     NavigationStack {
-        ChatView(apuntes: "La fotosíntesis es el proceso con el que las plantas convierten luz en energía.")
+        ChatView(apuntes: "La fotosíntesis es el proceso con el que las plantas convierten luz en energía.", mensajes: .constant([]))
     }
 }
