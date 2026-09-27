@@ -32,20 +32,6 @@ struct ContentView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    if !apuntes.isEmpty{
-                        NavigationLink{
-                            ChatView(apuntes: apuntes)
-                        } label: {
-                            Label("Preguntarle a mis apuntes", systemImage: "bubble.left.and.bubble.right")
-                        }
-                        .buttonStyle(.bordered)
-                    }
-                    Button{
-                        mostrandoEscaner = true
-                    } label: {
-                        Label("Escanear documento", systemImage: "doc.viewfinder")
-                    }
-                    .buttonStyle(.bordered)
                     TextEditor(text: $apuntes)
                         .frame(height: 160)
                         .padding(8)
@@ -108,11 +94,29 @@ struct ContentView: View {
                 ExamenView(preguntasIniciales: examen)
             }
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    NavigationLink("Mis sets") {
-                        ListaSetsView()
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        mostrandoEscaner = true
+                    } label: {
+                        Image(systemName: "doc.viewfinder")
                     }
-                    .tint(.coral)
+                }
+                if !apuntes.isEmpty {
+                    ToolbarItem(placement: .topBarLeading) {
+                        NavigationLink {
+                            ChatView(apuntes: apuntes)
+                        } label: {
+                            Image(systemName: "bubble.left.and.bubble.right")
+                        }
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink {
+                        ListaSetsView()
+                    } label: {
+                        Image(systemName: "folder")
+                    }
+                    .tint(.lila)
                 }
             }
         }
