@@ -14,6 +14,7 @@ struct StudyFlashApp: App {
         WindowGroup {
             ContentView()
                 .tint(.menta)
+                .preferredColorScheme(.light)
         }
         .modelContainer(for: SetDeEstudio.self)
     }
