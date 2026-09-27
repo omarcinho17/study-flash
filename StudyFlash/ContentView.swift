@@ -32,6 +32,14 @@ struct ContentView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
+                    if !apuntes.isEmpty{
+                        NavigationLink{
+                            ChatView(apuntes: apuntes)
+                        } label: {
+                            Label("Preguntarle a mis apuntes", systemImage: "bubble.left.and.bubble.right")
+                        }
+                        .buttonStyle(.bordered)
+                    }
                     Button{
                         mostrandoEscaner = true
                     } label: {

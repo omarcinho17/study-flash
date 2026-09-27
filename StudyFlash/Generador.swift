@@ -46,3 +46,5 @@ func generarExamen(de tarjetas: [Flashcard]) async throws -> [PreguntaExamen] {
     }
     return preguntas
 }
+
+
